@@ -72,6 +72,15 @@ class Storages {
 	function dirlistEx(dir);
 
 	/**
+	 * 指定ディレクトリ以下のファイル・フォルダ一覧（サブフォルダ含む）を取得する
+	 * @param dir ディレクトリ名
+	 * @param dironly フォルダ名のみでファイルは除外する
+	 * @return 一覧が格納された配列（木構造ではなくサブフォルダ含む全列挙）
+	 * 一覧には ./ ../ 系の自身や親の参照は含まれません
+	 */
+	function dirtree(dir, dironly=false);
+
+	/**
 	 * 指定ディレクトリを削除する
 	 * @param dir ディレクトリ名
 	 * @return 実際に削除されたら true

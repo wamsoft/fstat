@@ -23,6 +23,10 @@ global.FILE_ATTRIBUTE_TEMPORARY = 0x00000100;");
 
 NCB_TYPECONV_CAST_INTEGER(tjs_uint64);
 
+// for VS2008
+#ifndef FIND_FIRST_EX_LARGE_FETCH
+#define FIND_FIRST_EX_LARGE_FETCH 2
+#endif
 
 /**
  * メソッド追加用
@@ -437,6 +441,48 @@ public:
 			}
 		}
 		return !! r;
+	}
+
+	static tjs_error TJS_INTF_METHOD dirtree(tTJSVariant *result,
+											 tjs_int numparams,
+											 tTJSVariant **param,
+											 iTJSDispatch2 *objthis) {
+		if (numparams < 1) return TJS_E_BADPARAMCOUNT;
+		bool dironly = numparams > 1 ? param[1]->operator bool() : false;
+		
+		ttstr path(TVPNormalizeStorageName(ttstr(*param[0])+TJS_W("/")));
+		TVPGetLocalName(path);
+
+		iTJSDispatch2 * array = TJSCreateArrayObject();
+		tTJSVariant ret = tTJSVariant(array, array);
+		array->Release();
+
+		tjs_int count = 0;
+		_dirtree(path, TJS_W(""), array, count, dironly);
+
+		if (result) *result = ret;
+		return TJS_S_OK;
+	}
+	static void _dirtree(const ttstr &path, const ttstr &subdir, iTJSDispatch2 *array, tjs_int &count, bool dironly) {
+		WIN32_FIND_DATA data;
+		ttstr wildcard(path);
+		wildcard += TJS_W("*");
+		HANDLE handle = FindFirstFileExW(wildcard.c_str(), FindExInfoStandard, &data, FindExSearchLimitToDirectories, NULL, FIND_FIRST_EX_LARGE_FETCH);
+		if (handle != INVALID_HANDLE_VALUE) {
+			do {
+				ttstr dir(data.cFileName);
+				if (dir == TJS_W(".") || dir == TJS_W("..")) continue;
+				if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					ttstr name(subdir + dir + TJS_W("/"));
+					setDirListFile(array, count++, name, &data);
+					_dirtree(path + dir + TJS_W("\\"), name, array, count, dironly);
+				} else if (!dironly) {
+					ttstr name(subdir + dir);
+					setDirListFile(array, count++, name, &data);
+				}
+			} while (FindNextFile(handle, &data));
+			FindClose(handle);
+		}
 	}
 
 	/**
@@ -1037,6 +1083,7 @@ NCB_ATTACH_CLASS(StoragesFstat, Storages) {
 	NCB_METHOD(moveFile);
 	NCB_METHOD(dirlist);
 	NCB_METHOD(dirlistEx);
+	RawCallback("dirtree",             &Class::dirtree,             TJS_STATICMEMBER);
 	NCB_METHOD(removeDirectory);
 	NCB_METHOD(createDirectory);
 	NCB_METHOD(createDirectoryNoNormalize);
