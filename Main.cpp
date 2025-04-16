@@ -213,10 +213,10 @@ class StoragesFstat {
 			if (result) {
 				iTJSDispatch2 *dict = TJSCreateDictionaryObject();
 				if (dict != NULL) {
-					if (chksize && sel == 1) dict->PropSet(TJS_MEMBERENSURE, L"size",  NULL, &size, dict);
-					dict->PropSet(TJS_MEMBERENSURE, L"mtime", NULL, &mtime, dict);
-					dict->PropSet(TJS_MEMBERENSURE, L"ctime", NULL, &ctime, dict);
-					dict->PropSet(TJS_MEMBERENSURE, L"atime", NULL, &atime, dict);
+					if (chksize && sel == 1) dict->PropSet(TJS_MEMBERENSURE, TJS_W("size"),  NULL, &size, dict);
+					dict->PropSet(TJS_MEMBERENSURE, TJS_W("mtime"), NULL, &mtime, dict);
+					dict->PropSet(TJS_MEMBERENSURE, TJS_W("ctime"), NULL, &ctime, dict);
+					dict->PropSet(TJS_MEMBERENSURE, TJS_W("atime"), NULL, &atime, dict);
 					*result = dict;
 					dict->Release();
 				}
@@ -257,7 +257,7 @@ public:
 				if (result) {
 					iTJSDispatch2 *dict;
 					if ((dict = TJSCreateDictionaryObject()) != NULL) {
-						dict->PropSet(TJS_MEMBERENSURE, L"size",  NULL, &size, dict);
+						dict->PropSet(TJS_MEMBERENSURE, TJS_W("size"),  NULL, &size, dict);
 						*result = dict;
 						dict->Release();
 					}
@@ -298,9 +298,9 @@ public:
 		tTJSVariant size, ctime, atime, mtime;
 		iTJSDispatch2 *dict = param[1]->AsObjectNoAddRef();
 		if (dict != NULL) {
-			dict->PropGet(0, L"ctime", NULL, &ctime, dict);
-			dict->PropGet(0, L"atime", NULL, &atime, dict);
-			dict->PropGet(0, L"mtime", NULL, &mtime, dict);
+			dict->PropGet(0, TJS_W("ctime"), NULL, &ctime, dict);
+			dict->PropGet(0, TJS_W("atime"), NULL, &atime, dict);
+			dict->PropGet(0, TJS_W("mtime"), NULL, &mtime, dict);
 		}
 		int sel = setFileTime(filename, ctime, atime, mtime);
 		if (result) *result = (sel > 0);
@@ -560,24 +560,24 @@ private:
 			{
 				ttstr fname = data->cFileName;
 				tTJSVariant name = fname;
-				dict->PropSet(TJS_MEMBERENSURE, L"name", NULL, &name, dict);
+				dict->PropSet(TJS_MEMBERENSURE, TJS_W("name"), NULL, &name, dict);
 			} {
 				tjs_int64 fsize = data->nFileSizeHigh;
 				fsize <<= 32;
 				fsize  |= data->nFileSizeLow;
 				tTJSVariant size = fsize;
-				dict->PropSet(TJS_MEMBERENSURE, L"size", NULL, &size, dict);
+				dict->PropSet(TJS_MEMBERENSURE, TJS_W("size"), NULL, &size, dict);
 			} {
 				tTJSVariant attrib = (tjs_int)data->dwFileAttributes;
-				dict->PropSet(TJS_MEMBERENSURE, L"attrib", NULL, &attrib, dict);
+				dict->PropSet(TJS_MEMBERENSURE, TJS_W("attrib"), NULL, &attrib, dict);
 			} {
 				tTJSVariant ctime, atime, mtime;
 				storeDate(ctime, data->ftCreationTime,   NULL);
 				storeDate(atime, data->ftLastAccessTime, NULL);
 				storeDate(mtime, data->ftLastWriteTime,  NULL);
-				dict->PropSet(TJS_MEMBERENSURE, L"mtime", NULL, &mtime, dict);
-				dict->PropSet(TJS_MEMBERENSURE, L"ctime", NULL, &ctime, dict);
-				dict->PropSet(TJS_MEMBERENSURE, L"atime", NULL, &atime, dict);
+				dict->PropSet(TJS_MEMBERENSURE, TJS_W("mtime"), NULL, &mtime, dict);
+				dict->PropSet(TJS_MEMBERENSURE, TJS_W("ctime"), NULL, &ctime, dict);
+				dict->PropSet(TJS_MEMBERENSURE, TJS_W("atime"), NULL, &atime, dict);
 			}
 			tTJSVariant val(dict, dict);
 			array->PropSetByNum(0, count, &val, array);
@@ -757,14 +757,14 @@ public:
 
 		//	HWND
 		iTJSDispatch2*	elm	= param[0]->AsObjectNoAddRef();
-		if(elm->IsValid(0, L"window", NULL, elm) == TJS_S_TRUE &&
-			TJS_SUCCEEDED(elm->PropGet(0, L"window", NULL, &val, elm)))
+		if(elm->IsValid(0, TJS_W("window"), NULL, elm) == TJS_S_TRUE &&
+			TJS_SUCCEEDED(elm->PropGet(0, TJS_W("window"), NULL, &val, elm)))
 		{
 			HWND	owner	= NULL;
 			if(val.Type() != tvtVoid)
 			{
 				tmp	= val.AsObjectNoAddRef();
-				if(TJS_SUCCEEDED(tmp->PropGet(0, L"HWND", NULL, &val, tmp)))
+				if(TJS_SUCCEEDED(tmp->PropGet(0, TJS_W("HWND"), NULL, &val, tmp)))
 					owner	= (HWND)val.AsInteger();
 			}
 			bi.hwndOwner	= owner != NULL ? owner : TVPGetApplicationWindowHandle();
@@ -773,8 +773,8 @@ public:
 			bi.hwndOwner	= NULL;
 
 		//	title
-		if(elm->IsValid(0, L"title", NULL, elm) == TJS_S_TRUE &&
-			TJS_SUCCEEDED(elm->PropGet(0, L"title", NULL, &val, elm)))
+		if(elm->IsValid(0, TJS_W("title"), NULL, elm) == TJS_S_TRUE &&
+			TJS_SUCCEEDED(elm->PropGet(0, TJS_W("title"), NULL, &val, elm)))
 		{
 			ttstr	title	= val.AsStringNoAddRef();
 			bi.lpszTitle	= title.c_str();
@@ -785,9 +785,9 @@ public:
 		//	name
 		bi.pszDisplayName	= NULL;
 		bi.ulFlags	= BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-		if(elm->IsValid(0, L"name", NULL, elm) == TJS_S_TRUE &&
-			TJS_SUCCEEDED(elm->PropGet(0, L"name", NULL, &val, elm)) &&
-			!val.NormalCompare(ttstr(L"")))
+		if(elm->IsValid(0, TJS_W("name"), NULL, elm) == TJS_S_TRUE &&
+			TJS_SUCCEEDED(elm->PropGet(0, TJS_W("name"), NULL, &val, elm)) &&
+			!val.NormalCompare(ttstr(TJS_W(""))))
 		{
 			ttstr	name	= TVPNormalizeStorageName(val.AsStringNoAddRef());
 			TVPGetLocalName(name);
@@ -797,8 +797,8 @@ public:
 			folder[0]	= 0;
 
 		//	root dir
-		if(elm->IsValid(0, L"rootDir", NULL, elm) == TJS_S_TRUE &&
-			TJS_SUCCEEDED(elm->PropGet(0, L"rootDir", NULL, &val, elm)))
+		if(elm->IsValid(0, TJS_W("rootDir"), NULL, elm) == TJS_S_TRUE &&
+			TJS_SUCCEEDED(elm->PropGet(0, TJS_W("rootDir"), NULL, &val, elm)))
 		{
 			ttstr	rootDir	= TVPNormalizeStorageName(val.AsStringNoAddRef());
 			TVPGetLocalName(rootDir);
@@ -821,7 +821,7 @@ public:
 				if(result) *result = TJS_S_TRUE;
 				val	= folder;
 				val = TVPNormalizeStorageName(val);
-				elm->PropSet(TJS_MEMBERENSURE, L"name", NULL, &val, elm);
+				elm->PropSet(TJS_MEMBERENSURE, TJS_W("name"), NULL, &val, elm);
 			}
 			FreeITEMIDLIST(pidl);
 		}
@@ -1058,7 +1058,7 @@ public:
 		TCHAR crDir[MAX_PATH + 1];
 		GetCurrentDirectory(MAX_PATH + 1 , crDir);
 		ttstr result(crDir);
-		return TVPNormalizeStorageName(result + L"\\");
+		return TVPNormalizeStorageName(result + TJS_W("\\"));
 	}
 	
 	static void setCurrentPath(ttstr path) {
