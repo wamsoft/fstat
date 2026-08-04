@@ -1075,8 +1075,9 @@ NCB_ATTACH_CLASS(StoragesFstat, Storages) {
 	RawCallback("fstat",               &Class::fstat,               TJS_STATICMEMBER);
 	RawCallback("getTime",             &Class::getTime,             TJS_STATICMEMBER);
 	RawCallback("setTime",             &Class::setTime,             TJS_STATICMEMBER);
-	NCB_METHOD(getLastModifiedFileTime);
-	NCB_METHOD(setLastModifiedFileTime);
+	// getLastModifiedFileTime は本体に実装済み(FILETIME 統一)。本体に無い旧環境でのみ補完。
+	NCB_METHOD_IF_MISSING(getLastModifiedFileTime);
+	NCB_METHOD(setLastModifiedFileTime); // set は本体に無いので常に登録
 	NCB_METHOD(exportFile);
 	NCB_METHOD(deleteFile);
 	NCB_METHOD(truncateFile);
@@ -1091,7 +1092,8 @@ NCB_ATTACH_CLASS(StoragesFstat, Storages) {
 	NCB_METHOD(setFileAttributes);
 	NCB_METHOD(resetFileAttributes);
 	NCB_METHOD(getFileAttributes);
-	RawCallback("selectDirectory",     &Class::selectDirectory,     TJS_STATICMEMBER);
+	// selectDirectory は本体に実装済み。本体に無い旧環境でのみ補完登録する。
+	RawCallbackIfMissing("selectDirectory", &Class::selectDirectory,     TJS_STATICMEMBER);
 	NCB_METHOD(isExistentDirectory);
 	NCB_METHOD(copyFile);
 	NCB_METHOD(copyFileNoNormalize);
