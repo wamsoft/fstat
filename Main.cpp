@@ -1070,39 +1070,57 @@ public:
 	}
 };
 
+// ⚠ **本体が提供しているものは IF_MISSING で登録する** (本体を上書きしない)。
+//
+//    2026-09 に、下回り (TVPCreateStream / TVPMoveStorage / TVPRemoveStorage /
+//    TVPCreateFolders / TVPRemoveFolder / TVPFileSize / TVPLastModifiedFileTime /
+//    TVPGetLocalFolderListAt) が WINVER / generic の両方にあるものは
+//    **本体 (common/base/StorageIntf.cpp) へ移した**:
+//      clearStorageCaches / fstat / dirlist / dirlistEx / dirtree /
+//      isExistentDirectory / isExistentStorageNoSearchNoNormalize /
+//      createDirectory / removeDirectory / moveFile / deleteFile /
+//      copyFile / exportFile / truncateFile / getMD5HashString /
+//      getTemporaryName
+//    これらは IF_MISSING にしてあるので、本体がある環境では登録されない
+//    (古い本体と組み合わせたときだけプラグインが補完する)。
+//
+//    常に登録するのは **下回りが本体に無いもの** = Win32 の属性ビット /
+//    タイムスタンプ書き込み / SearchPath / シェルの表示名 / カレントパス /
+//    DELETE_ON_CLOSE ハンドル、だけ。
 NCB_ATTACH_CLASS(StoragesFstat, Storages) {
-	NCB_METHOD(clearStorageCaches);
-	RawCallback("fstat",               &Class::fstat,               TJS_STATICMEMBER);
+	// --- 本体にあれば本体を使う (無い環境でのみ補完) ---
+	NCB_METHOD_IF_MISSING(clearStorageCaches);
+	RawCallbackIfMissing("fstat",      &Class::fstat,               TJS_STATICMEMBER);
+	NCB_METHOD_IF_MISSING(getLastModifiedFileTime);
+	NCB_METHOD_IF_MISSING(exportFile);
+	NCB_METHOD_IF_MISSING(deleteFile);
+	NCB_METHOD_IF_MISSING(truncateFile);
+	NCB_METHOD_IF_MISSING(moveFile);
+	NCB_METHOD_IF_MISSING(dirlist);
+	NCB_METHOD_IF_MISSING(dirlistEx);
+	RawCallbackIfMissing("dirtree",    &Class::dirtree,             TJS_STATICMEMBER);
+	NCB_METHOD_IF_MISSING(removeDirectory);
+	NCB_METHOD_IF_MISSING(createDirectory);
+	RawCallbackIfMissing("selectDirectory", &Class::selectDirectory, TJS_STATICMEMBER);
+	NCB_METHOD_IF_MISSING(isExistentDirectory);
+	NCB_METHOD_IF_MISSING(copyFile);
+	NCB_METHOD_IF_MISSING(isExistentStorageNoSearchNoNormalize);
+	RawCallbackIfMissing("getMD5HashString", &Class::getMD5HashString, TJS_STATICMEMBER);
+	MethodIfMissing(TJS_W("getTemporaryName"), &TVPGetTemporaryName);
+
+	// --- 下回りが本体に無い = Win32 専用。常に登録する ---
 	RawCallback("getTime",             &Class::getTime,             TJS_STATICMEMBER);
 	RawCallback("setTime",             &Class::setTime,             TJS_STATICMEMBER);
-	// getLastModifiedFileTime は本体に実装済み(FILETIME 統一)。本体に無い旧環境でのみ補完。
-	NCB_METHOD_IF_MISSING(getLastModifiedFileTime);
-	NCB_METHOD(setLastModifiedFileTime); // set は本体に無いので常に登録
-	NCB_METHOD(exportFile);
-	NCB_METHOD(deleteFile);
-	NCB_METHOD(truncateFile);
-	NCB_METHOD(moveFile);
-	NCB_METHOD(dirlist);
-	NCB_METHOD(dirlistEx);
-	RawCallback("dirtree",             &Class::dirtree,             TJS_STATICMEMBER);
-	NCB_METHOD(removeDirectory);
-	NCB_METHOD(createDirectory);
+	NCB_METHOD(setLastModifiedFileTime);
 	NCB_METHOD(createDirectoryNoNormalize);
+	NCB_METHOD(copyFileNoNormalize);
 	NCB_METHOD(changeDirectory);
 	NCB_METHOD(setFileAttributes);
 	NCB_METHOD(resetFileAttributes);
 	NCB_METHOD(getFileAttributes);
-	// selectDirectory は本体に実装済み。本体に無い旧環境でのみ補完登録する。
-	RawCallbackIfMissing("selectDirectory", &Class::selectDirectory,     TJS_STATICMEMBER);
-	NCB_METHOD(isExistentDirectory);
-	NCB_METHOD(copyFile);
-	NCB_METHOD(copyFileNoNormalize);
-	NCB_METHOD(isExistentStorageNoSearchNoNormalize);
 	NCB_METHOD(getDisplayName);
-	RawCallback("getMD5HashString",    &Class::getMD5HashString,    TJS_STATICMEMBER);
 	RawCallback("searchPath",          &Class::searchPath,          TJS_STATICMEMBER);
 	Property("currentPath", &Class::getCurrentPath, &Class::setCurrentPath);
-	Method(TJS_W("getTemporaryName"), &TVPGetTemporaryName);
 };
 
 // テンポラリファイル処理用クラス
