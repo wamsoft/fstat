@@ -1076,7 +1076,7 @@ public:
 //    TVPCreateFolders / TVPRemoveFolder / TVPFileSize / TVPLastModifiedFileTime /
 //    TVPGetLocalFolderListAt) が WINVER / generic の両方にあるものは
 //    **本体 (common/base/StorageIntf.cpp) へ移した**:
-//      clearStorageCaches / fstat / dirlist / dirlistEx / dirtree /
+//      clearStorageCaches / fstat / dirlist / dirtree /
 //      isExistentDirectory / isExistentStorageNoSearchNoNormalize /
 //      createDirectory / removeDirectory / moveFile / deleteFile /
 //      copyFile / exportFile / truncateFile / getMD5HashString /
@@ -1084,20 +1084,22 @@ public:
 //    これらは IF_MISSING にしてあるので、本体がある環境では登録されない
 //    (古い本体と組み合わせたときだけプラグインが補完する)。
 //
+//    ⚠ ただし fstat は例外で**常に登録して本体を上書きする**。 本体版は
+//    size と mtime (Date) だけで、こちらは atime / ctime も返すため。
+//    dirlistEx (size / attrib / 時刻付きの列挙) は本体に無いので常に登録する。
+//
 //    常に登録するのは **下回りが本体に無いもの** = Win32 の属性ビット /
 //    タイムスタンプ書き込み / SearchPath / シェルの表示名 / カレントパス /
 //    DELETE_ON_CLOSE ハンドル、だけ。
 NCB_ATTACH_CLASS(StoragesFstat, Storages) {
 	// --- 本体にあれば本体を使う (無い環境でのみ補完) ---
 	NCB_METHOD_IF_MISSING(clearStorageCaches);
-	RawCallbackIfMissing("fstat",      &Class::fstat,               TJS_STATICMEMBER);
 	NCB_METHOD_IF_MISSING(getLastModifiedFileTime);
 	NCB_METHOD_IF_MISSING(exportFile);
 	NCB_METHOD_IF_MISSING(deleteFile);
 	NCB_METHOD_IF_MISSING(truncateFile);
 	NCB_METHOD_IF_MISSING(moveFile);
 	NCB_METHOD_IF_MISSING(dirlist);
-	NCB_METHOD_IF_MISSING(dirlistEx);
 	RawCallbackIfMissing("dirtree",    &Class::dirtree,             TJS_STATICMEMBER);
 	NCB_METHOD_IF_MISSING(removeDirectory);
 	NCB_METHOD_IF_MISSING(createDirectory);
@@ -1107,6 +1109,10 @@ NCB_ATTACH_CLASS(StoragesFstat, Storages) {
 	NCB_METHOD_IF_MISSING(isExistentStorageNoSearchNoNormalize);
 	RawCallbackIfMissing("getMD5HashString", &Class::getMD5HashString, TJS_STATICMEMBER);
 	MethodIfMissing(TJS_W("getTemporaryName"), &TVPGetTemporaryName);
+
+	// --- 本体より詳しい情報を返すので、本体があっても上書きする ---
+	RawCallback("fstat",               &Class::fstat,               TJS_STATICMEMBER);
+	NCB_METHOD(dirlistEx);
 
 	// --- 下回りが本体に無い = Win32 専用。常に登録する ---
 	RawCallback("getTime",             &Class::getTime,             TJS_STATICMEMBER);

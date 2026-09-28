@@ -12,6 +12,8 @@ class Storages {
 	
 	/**
 	 * ファイル属性の取得
+	 * ※本体にも同名のメソッドがありますが、本プラグインを読み込むと
+	 *   こちらの版で上書きされます。本体版との違い: 本体版は size と mtime だけを返し、atime / ctime を返しません。
 	 * @param file 対象ファイル
 	 * @return 属性情報の入った辞書
 	 * size: ファイルサイズ
@@ -23,6 +25,9 @@ class Storages {
 
 	/**
 	 * 吉里吉里のストレージ空間中のファイルを抽出する
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.exportFile](Storages.md#exportfile) を参照してください。
 	 * @param src 保存元ファイル
 	 * @param dest 保存先ファイル
 	 */
@@ -30,6 +35,9 @@ class Storages {
 
 	/**
 	 * 吉里吉里のストレージ空間中の指定ファイルを削除する。
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.deleteFile](Storages.md#deletefile) を参照してください。
 	 * @param file 削除対象ファイル
 	 * @return 実際に削除されたら true
 	 * 実ファイルがある場合のみ削除されます
@@ -38,6 +46,9 @@ class Storages {
 
 	/**
 	 * 吉里吉里のストレージ空間中の指定ファイルのサイズを変更する(切り捨てる)
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.truncateFile](Storages.md#truncatefile) を参照してください。
 	 * @param file ファイル
 	 * @param size 指定サイズ
 	 * @return サイズ変更できたら true
@@ -47,6 +58,9 @@ class Storages {
 	
 	/**
 	 * 指定ファイルを移動する。
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.moveFile](Storages.md#movefile) を参照してください。
 	 * @param fromFile 移動対象ファイル
 	 * @param toFile 移動先パス
 	 * @return 実際に移動されたら true
@@ -57,6 +71,9 @@ class Storages {
 
 	/**
 	 * 指定ディレクトリのファイル一覧を取得する
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.dirlist](Storages.md#dirlist) を参照してください。
 	 * @param dir ディレクトリ名
 	 * @return ファイル名一覧が格納された配列
 	 */
@@ -73,6 +90,9 @@ class Storages {
 
 	/**
 	 * 指定ディレクトリ以下のファイル・フォルダ一覧（サブフォルダ含む）を取得する
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.dirtree](Storages.md#dirtree) を参照してください。
 	 * @param dir ディレクトリ名
 	 * @param dironly フォルダ名のみでファイルは除外する
 	 * @return 一覧が格納された配列（木構造ではなくサブフォルダ含む全列挙）
@@ -82,6 +102,9 @@ class Storages {
 
 	/**
 	 * 指定ディレクトリを削除する
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.removeDirectory](Storages.md#removedirectory) を参照してください。
 	 * @param dir ディレクトリ名
 	 * @return 実際に削除されたら true
 	 * 中にファイルが無い場合のみ削除されます
@@ -90,6 +113,9 @@ class Storages {
 
 	/**
 	 * ディレクトリを作成する
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.createDirectory](Storages.md#createdirectory) を参照してください。
 	 * @param dir ディレクトリ名
 	 * @return 実際に作成できたら true
 	 */
@@ -146,6 +172,9 @@ class Storages {
 
 	/**
 	 * ディレクトリの存在チェック
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.isExistentDirectory](Storages.md#isexistentdirectory) を参照してください。
 	 * @param dir ディレクトリ名
 	 * @return ディレクトリが存在すれば true/存在しなければ -1/ディレクトリでなければ false
 	 */
@@ -176,6 +205,9 @@ class Storages {
 
 	/**
 	 * 更新日取得（高速版）
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.getLastModifiedFileTime](Storages.md#getlastmodifiedfiletime) を参照してください。
 	 * @param target 対象ファイルまたはディレクトリ
 	 * @return 時間（WINDOWSのFILETIME 64bit値）
 	 */
@@ -190,6 +222,9 @@ class Storages {
 
 	/**
 	 * 吉里吉里のストレージ空間中の指定ファイルをコピーする
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.copyFile](Storages.md#copyfile) を参照してください。
 	 * @param from コピー元ファイル
 	 * @param to コピー先ファイル
 	 * @param failIfExist ファイルが存在するときに失敗するなら ture、上書きするなら false
@@ -211,6 +246,9 @@ class Storages {
 	/**
 	 * パスの正規化を行なわず、autoPathからの検索も行なわずに
 	 * ファイルの存在確認を行う
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.isExistentStorageNoSearchNoNormalize](Storages.md#isexistentstoragenosearchnonormalize) を参照してください。
 	 * @param filename ファイル名
 	 * @return ファイルが存在したらtrue
 	 */
@@ -226,6 +264,9 @@ class Storages {
 
 	/**
 	 * MD5ハッシュ値の取得
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.getMD5HashString](Storages.md#getmd5hashstring) を参照してください。
 	 * @param filename 対象ファイル名
 	 * @return ハッシュ値（32文字の16進数ハッシュ文字列（小文字））
 	 */
@@ -242,6 +283,9 @@ class Storages {
 
 	/**
 	 * テンポラリファイル名の取得
+	 * ※本体に同名のメソッドがある環境では本体版が使われます
+	 *   (本プラグインは本体に無い旧環境でのみ補完登録します)。
+	 *   仕様は本体の [Storages.getTemporaryName](Storages.md#gettemporaryname) を参照してください。
 	 * @return テンポラリファイル名（TVPGetTemporaryName()の文字列）
 	 */
 	function getTemporaryName(); // by miahmie
