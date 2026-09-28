@@ -1084,8 +1084,9 @@ public:
 //    これらは IF_MISSING にしてあるので、本体がある環境では登録されない
 //    (古い本体と組み合わせたときだけプラグインが補完する)。
 //
-//    ⚠ ただし fstat は例外で**常に登録して本体を上書きする**。 本体版は
-//    size と mtime (Date) だけで、こちらは atime / ctime も返すため。
+//    ⚠ ただし fstat / getTime / currentPath は例外で**常に登録して本体を上書きする**。
+//    本体版は fstat が size と mtime (Date)、getTime が mtime だけ、currentPath が
+//    読み取り専用で、こちらは atime / ctime も返し、currentPath へ代入もできるため。
 //    dirlistEx (size / attrib / 時刻付きの列挙) は本体に無いので常に登録する。
 //
 //    常に登録するのは **下回りが本体に無いもの** = Win32 の属性ビット /
